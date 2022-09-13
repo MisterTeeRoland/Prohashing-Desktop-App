@@ -1,0 +1,38 @@
+.navStyle {
+    list-style: none;
+    border-right: 1px solid #ccc;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+    padding: 30px 20px;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.linkStyle {
+    text-decoration: none;
+    color: #fff;
+}
+
+.linkStyle:hover {
+    color: #ccc;
+}
+
+.linkStyle.active {
+    color: #c71b5f;
+}
+
+.listItemStyle {
+    margin-bottom: 30px;
+}
+
+.iconStyle {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 30px;
+}
+
+.linkText {
+    font-size: 14px;
+    font-weight: bold;
+}

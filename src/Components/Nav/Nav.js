@@ -1,44 +1,58 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import logo from "../../assets/logo.svg";
+import { Link, useLocation } from "react-router-dom";
+import icon from "../../assets/icon.png";
+import { FaHome, FaCog, FaTruck } from "react-icons/fa";
+import "../../assets/css/nav.css";
 
 const Nav = () => {
-  const navStyle = {
-    display: "flex",
-    // justifyContent: "space-between",
-    alignItems: "center",
-    flexDirection: "row",
-    listStyle: "none",
-  };
+    const location = useLocation();
+    let page = location.pathname.replace("/", "");
+    if (page === "") {
+        page = "home";
+    }
 
-  const linkStyle = {
-    textDecoration: "none",
-    color: "#fff",
-    marginRight: "10px",
-  };
-
-  return (
-    <nav>
-      <img src={logo} alt="logo" />
-      <ul style={navStyle}>
-        <li>
-          <Link to="/" style={linkStyle}>
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link to="/workers" style={linkStyle}>
-            Workers
-          </Link>
-        </li>
-        <li>
-          <Link to="/settings" style={linkStyle}>
-            Settings
-          </Link>
-        </li>
-      </ul>
-    </nav>
-  );
+    return (
+        <nav>
+            <ul className="navStyle">
+                <li>
+                    <Link to="/">
+                        <img src={icon} alt="logo" className="iconStyle" />
+                    </Link>
+                </li>
+                <li className="listItemStyle">
+                    <Link
+                        to="/"
+                        className={`linkStyle ${page === "home" && "active"}`}
+                    >
+                        <FaHome size={"40px"} title={"Home"} />
+                        <div className="linkText">Home</div>
+                    </Link>
+                </li>
+                <li className="listItemStyle">
+                    <Link
+                        to="/workers"
+                        className={`linkStyle ${
+                            page === "workers" && "active"
+                        }`}
+                    >
+                        <FaTruck size={"40px"} title={"Workers"} />
+                        <div className="linkText">Workers</div>
+                    </Link>
+                </li>
+                <li className="listItemStyle">
+                    <Link
+                        to="/settings"
+                        className={`linkStyle ${
+                            page === "settings" && "active"
+                        }`}
+                    >
+                        <FaCog size={"40px"} title={"Settings"} />
+                        <div className="linkText">Settings</div>
+                    </Link>
+                </li>
+            </ul>
+        </nav>
+    );
 };
 
 export default Nav;

@@ -7,17 +7,26 @@ import Settings from "./Components/Settings/Settings";
 import Wamp from "./Components/Wamp/Wamp";
 
 function App() {
-  return (
-    <Router>
-      <Nav />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/workers" element={<Workers />} />
-        <Route path="/settings" element={<Settings />} />
-      </Routes>
-      <Wamp />
-    </Router>
-  );
+    const pageLayout = {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "stretch",
+    };
+
+    return (
+        <Router>
+            <div style={pageLayout}>
+                <Nav />
+
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/workers" element={<Workers />} />
+                    <Route path="/settings" element={<Settings />} />
+                </Routes>
+            </div>
+            <Wamp />
+        </Router>
+    );
 }
 
 export default App;
