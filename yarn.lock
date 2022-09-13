@@ -3233,6 +3233,13 @@ coa@^2.0.2:
     chalk "^2.4.1"
     q "^1.1.2"
 
+coinmarketcap-cryptocurrency-icons@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/coinmarketcap-cryptocurrency-icons/-/coinmarketcap-cryptocurrency-icons-1.0.1.tgz#d656d4d743a477442a094b4637fc41c6d05ffa8a"
+  integrity sha512-YMd7pWYS5/6iu6/a8Y9YigLH7BzR6QIs1Ah+MGFhIt13O8ty5bIOEQqi195EKJkl4CZFL4WTm9J9+GGVBtgqKg==
+  dependencies:
+    prop-types "^15.7.2"
+
 collect-v8-coverage@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/collect-v8-coverage/-/collect-v8-coverage-1.0.1.tgz#cc2c8e94fc18bbdffe64d6534570c8a673b27f59"
@@ -7682,7 +7689,7 @@ prompts@^2.0.1, prompts@^2.4.2:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.8.1:
+prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==

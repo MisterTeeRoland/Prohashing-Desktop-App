@@ -1,0 +1,74 @@
+.workersContainer {
+    margin-top: 30px;
+    padding-right: 30px;
+}
+
+.workerContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: #353d7a;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.workerContainer:hover {
+    background-color: #2f376e;
+}
+
+.workerDetails {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.workerIcon {
+    margin-right: 10px;
+}
+
+.workerName {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.workerStatus {
+    font-size: 14px;
+    color: #fff;
+}
+
+.workerHashRate {
+    text-align: right;
+}
+
+.hashValue {
+    font-weight: bold;
+}
+
+.hashRatio {
+    font-size: 14px;
+    color: #fff;
+}
+
+.workerOnline {
+    background-color: #00ff00;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.workerOffline {
+    background-color: #ff0000;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}

@@ -1,0 +1,50 @@
+.phContainer {
+    padding: 0px 30px;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+.pageTitle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.titleText {
+    font-size: 38px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.btnPrimary {
+    background-color: #c71b5f;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.btnPrimary:hover {
+    background-color: #b71b5f;
+}
+
+.btnSecondary {
+    background-color: #5e75b6;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.btnSecondary:hover {
+    background-color: #5e75a6;
+}

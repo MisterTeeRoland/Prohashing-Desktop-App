@@ -1,0 +1,55 @@
+.homeContainer {
+    margin-top: 30px;
+    padding-right: 30px;
+}
+
+.tokenContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: #353d7a;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.tokenContainer:hover {
+    background-color: #2f376e;
+}
+
+.tokenIcon {
+    margin-right: 10px;
+}
+
+.tokenDetails {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.tokenName {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.tokenBalance {
+    font-size: 14px;
+    color: #fff;
+}
+
+.tokenUsdValue {
+    text-align: right;
+}
+
+.tokenCurrencyValue {
+    font-weight: bold;
+}
+
+.tokenCurrency {
+    font-size: 14px;
+}
