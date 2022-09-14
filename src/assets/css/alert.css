@@ -1,0 +1,10 @@
+.warning {
+    background-color: #765ca1;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.warningHeader {
+    font-weight: bold;
+    font-size: 24px;
+}

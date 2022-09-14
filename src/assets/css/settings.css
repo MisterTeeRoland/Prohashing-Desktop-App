@@ -1,32 +1,33 @@
 .settingsContainer {
-  margin-top: 30px;
-  padding-right: 30px;
+    margin-top: 30px;
+    padding-right: 30px;
 }
 
 .formControl {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 label {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  display: block;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
 }
 
 select,
 input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 16px;
-  display: block;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    display: block;
 }
 
 .buttonContainer {
-  margin-top: 50px;
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
 }
