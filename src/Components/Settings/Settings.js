@@ -1,16 +1,17 @@
 import React, { useState } from "react";
-import { FaCog } from "react-icons/fa";
+import { FaCog, FaInfoCircle } from "react-icons/fa";
 import "../../assets/css/layout.css";
 import "../../assets/css/settings.css";
+import ProhashingApiModal from "../Modal/ProhashingApiModal";
 
 const Settings = ({ settings, onSaveSettings }) => {
     const [apiKey, setApiKey] = useState(settings?.apiKey ?? "");
     const [currency, setCurrency] = useState(settings?.currency ?? "USD");
     const [smallBalance, setSmallBalance] = useState(
-        settings?.smallBalance ?? 0.01
+        settings?.smallBalance ?? 0.01,
     );
 
-    console.log("Settings", settings);
+    const [showPHModal, setShowPHModal] = useState(false);
 
     const saveSettings = () => {
         onSaveSettings({ apiKey, currency, smallBalance });
@@ -23,6 +24,14 @@ const Settings = ({ settings, onSaveSettings }) => {
         onSaveSettings({});
     };
 
+    const openPhModal = () => {
+        setShowPHModal(true);
+    };
+
+    const closePhModal = () => {
+        setShowPHModal(false);
+    };
+
     return (
         <div className="phContainer">
             <div className="pageTitle">
@@ -32,7 +41,14 @@ const Settings = ({ settings, onSaveSettings }) => {
 
             <div className="settingsContainer">
                 <div className="formControl">
-                    <label>Prohashing API Key</label>
+                    <label>
+                        Prohashing API Key{" "}
+                        <FaInfoCircle
+                            onClick={openPhModal}
+                            cursor={"pointer"}
+                            style={{ marginLeft: "5px" }}
+                        />
+                    </label>
                     <input
                         type="text"
                         value={apiKey}
@@ -44,8 +60,7 @@ const Settings = ({ settings, onSaveSettings }) => {
                     <label>Default Display Currency</label>
                     <select
                         value={currency}
-                        onChange={(e) => setCurrency(e.target.value)}
-                    >
+                        onChange={(e) => setCurrency(e.target.value)}>
                         <option value="usd">USD</option>
                     </select>
                 </div>
@@ -69,6 +84,8 @@ const Settings = ({ settings, onSaveSettings }) => {
                     Reset
                 </button>
             </div>
+
+            {showPHModal && <ProhashingApiModal onClose={closePhModal} />}
         </div>
     );
 };
