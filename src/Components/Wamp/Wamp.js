@@ -1,78 +1,119 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import autobahn from "autobahn";
 
-const Wamp = () => {
-  var wampConnection = null;
-  var wampSession = null;
-  var wampUser = "web";
-  var wampPassword = "web";
+const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
+    const wampUser = "web";
+    const wampPassword = "web";
+    const wampConnection = useRef(null);
+    const wampSession = useRef(null);
 
-  try {
-    // for Node.js
-    var autobahn = require("autobahn");
-  } catch (e) {
-    // for browsers (where AutobahnJS is available globally)
-  }
+    const balances = {};
+    const workers = {};
 
-  //If using node.js, the following code resolves an issue where the Electronic Frontier Foundation's free certificates are not trusted.
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    //If using node.js, the following code resolves an issue where the Electronic Frontier Foundation's free certificates are not trusted.
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-  function onChallenge(wampSession, method, extra) {
-    if (method == "wampcra") {
-      return autobahn.auth_cra.sign(wampPassword, extra.challenge);
-    }
-  }
+    const onChallenge = (wampSession, method, extra) => {
+        if (method === "wampcra") {
+            return autobahn.auth_cra.sign(wampPassword, extra.challenge);
+        }
+    };
 
-  function connectionOpen(session, details) {
-    console.log("jjj session", session);
-    console.log("lll details", details);
-    wampSession = session;
-    wampSession.subscribe("found_block_updates", onBlockUpdate);
-    wampSession
-      .call("f_all_miner_updates", [
-        "0a7a6fade943f7b6b9e96b4d1516bfcc733b5158af18d1b43aeec7e45a238c02",
-      ])
-      .then(initialSessionUpdatesReceived);
-  }
+    const connectionOpen = (session, details) => {
+        //get initial miner data
+        wampSession.current = session;
+        wampSession.current
+            .call("f_all_miner_updates", [apiKey])
+            .then(initialSessionUpdatesReceived);
 
-  function onBlockUpdate(block) {
-    //Handle found blocks here.
+        //get initial balance data
+        wampSession.current
+            .call("f_all_balance_updates", [apiKey])
+            .then(initialBalanceUpdatesReceived);
 
-    console.log("BLOCK", block);
-  }
+        //subscribe to block updates
+        wampSession.current.subscribe("found_block_updates", onBlockUpdate);
+    };
 
-  function initialSessionUpdatesReceived(updates) {
-    //Handle the initial miner information here.
+    //handles found block data
+    const onBlockUpdate = (block) => {
+        // console.log("BLOCK", block);
+        //TODO: if block is found by a miner in the workers array, send notification
+    };
 
-    console.log("ppp updates", updates);
+    //handles the initial miner information
+    const initialSessionUpdatesReceived = (updates) => {
+        //Handle the initial miner information here.
 
-    //After handling the initial information, now subscribe to receive future updates.
-    wampSession.subscribe(
-      "miner_update_diffs_0a7a6fade943f7b6b9e96b4d1516bfcc733b5158af18d1b43aeec7e45a238c02",
-      onMinerUpdate
-    );
-  }
+        console.log("initial miner values -", updates);
+        updates.forEach((worker, index) => {
+            workers[worker.miner_name] = worker;
+        });
 
-  function onMinerUpdate(update) {
-    //Handle live miner updates here.
-    console.log("MINER UPDATE", update);
-  }
+        onUpdateWorkers(workers);
 
-  wampConnection = new autobahn.Connection({
-    url: "wss://live.prohashing.com:443/ws",
-    realm: "mining",
-    authmethods: ["wampcra"],
-    authid: wampUser,
-    onchallenge: onChallenge,
-  });
+        //After handling the initial information, now subscribe to receive future updates.
+        wampSession.current.subscribe(
+            `miner_update_diffs_${apiKey}`,
+            onMinerUpdate,
+        );
+    };
 
-  try {
-    wampConnection.onopen = connectionOpen;
-    wampConnection.open();
-  } catch (e) {
-    console.error(e);
-  }
+    //handles live miner updates
+    const onMinerUpdate = (update) => {
+        console.log("MINER UPDATE", update);
+        // restoreDict(workers, update);
+    };
 
-  return <></>;
-};
+    //handles the initial balance information
+    const initialBalanceUpdatesReceived = (updates) => {
+        console.log("initial balance values -", updates);
+        Object.entries(updates).forEach(([curr, value]) => {
+            balances[curr] = {
+                name: curr,
+                balance: value,
+            };
+        });
+
+        onUpdateBalances(balances);
+
+        //subscribe to receive future updates.
+        wampSession.current.subscribe(
+            `balance_updates_${apiKey}`,
+            onBalanceUpdate,
+        );
+    };
+
+    //handles live balance updates
+    const onBalanceUpdate = (update) => {
+        console.log("BALANCE UPDATE", update);
+    };
+
+    useEffect(() => {
+        if (!apiKey) {
+            wampConnection.current = null;
+            wampSession.current = null;
+            return;
+        }
+        try {
+            if (!wampConnection.current) {
+                wampConnection.current = new autobahn.Connection({
+                    url: "wss://live.prohashing.com:443/ws",
+                    realm: "mining",
+                    authmethods: ["wampcra"],
+                    authid: wampUser,
+                    onchallenge: onChallenge,
+                });
+                wampConnection.current.onopen = connectionOpen;
+                wampConnection.current.open();
+            }
+        } catch (e) {
+            console.error(e);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [apiKey]);
+
+    return <></>;
+});
 
 export default Wamp;
