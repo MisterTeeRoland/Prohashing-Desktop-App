@@ -14,8 +14,8 @@ function App() {
     };
 
     const [settings, setSettings] = useState({});
-    const [balances, setBalances] = useState({});
-    const [workers, setWorkers] = useState({});
+    const [balances, setBalances] = useState([]);
+    const [workers, setWorkers] = useState([]);
 
     useEffect(() => {
         //load settings from local storage

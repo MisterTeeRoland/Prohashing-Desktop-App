@@ -16,10 +16,10 @@ const Home = ({ settings, balances }) => {
             <div className="homeContainer">
                 {!settings?.apiKey ? (
                     <NoApiKeyWarning />
-                ) : Object.entries(balances).length === 0 ? (
+                ) : balances.length === 0 ? (
                     <NoBalancesWarning />
                 ) : (
-                    Object.entries(balances).map(([name, token], index) => (
+                    balances.map(([name, token], index) => (
                         <div className="tokenContainer" key={index}>
                             {token.symbol && (
                                 <div className="tokenIcon">

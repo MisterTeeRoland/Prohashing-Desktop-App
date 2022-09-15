@@ -16,10 +16,10 @@ const Workers = ({ settings, workers }) => {
             <div className="workersContainer">
                 {!settings?.apiKey ? (
                     <NoApiKeyWarning />
-                ) : Object.entries(workers).length === 0 ? (
+                ) : workers.length === 0 ? (
                     <NoWorkersWarning />
                 ) : (
-                    Object.entries(workers).map((worker, index) => (
+                    workers.map((worker, index) => (
                         <div className="workerContainer" key={index}>
                             <div className="workerIcon">
                                 <FaTruck size={"30px"} />
@@ -27,20 +27,15 @@ const Workers = ({ settings, workers }) => {
                             <div className="workerDetails">
                                 <div className="workerInfo">
                                     <div className="workerName">
-                                        {worker?.name}
+                                        {worker?.miner_name}
                                     </div>
                                     <div className="workerStatus">
-                                        {worker?.status === "Online" ? (
-                                            <div className="workerOnline"></div>
-                                        ) : (
-                                            <div className="workerOffline"></div>
-                                        )}
-                                        {worker?.status}
+                                        {worker?.algorithm_name}
                                     </div>
                                 </div>
                                 <div className="workerHashRate">
                                     <div className="hashValue">
-                                        {worker?.hashRate}
+                                        {worker?.hashrate}
                                     </div>
                                     <div className="hashRatio">H/s</div>
                                 </div>

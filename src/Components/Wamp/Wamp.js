@@ -9,6 +9,8 @@ const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
 
     const balances = {};
     const workers = {};
+    const sortedBalances = [];
+    const sortedWorkers = [];
 
     //If using node.js, the following code resolves an issue where the Electronic Frontier Foundation's free certificates are not trusted.
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -36,9 +38,16 @@ const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
     };
 
     //handles found block data
-    const onBlockUpdate = (block) => {
-        // console.log("BLOCK", block);
-        //TODO: if block is found by a miner in the workers array, send notification
+    const onBlockUpdate = (foundBlock) => {
+        const block = foundBlock[0];
+        console.log("BLOCK", block);
+        //if block is found by a miner in the workers array, send notification
+        if (workers[block.worker_name] !== null) {
+            // const notificationTitle = "Block Found!";
+            const notificationBody = `You found ${block.coin_name} block ${block.block_height}!`;
+            // console.log("block - ", notificationBody);
+            new Notification(notificationBody);
+        }
     };
 
     //handles the initial miner information
@@ -50,7 +59,7 @@ const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
             workers[worker.miner_name] = worker;
         });
 
-        onUpdateWorkers(workers);
+        sortWorkers();
 
         //After handling the initial information, now subscribe to receive future updates.
         wampSession.current.subscribe(
@@ -62,7 +71,27 @@ const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
     //handles live miner updates
     const onMinerUpdate = (update) => {
         console.log("MINER UPDATE", update);
-        // restoreDict(workers, update);
+        const worker = update[0];
+        //update worker here...
+        workers[worker.miner_name] = worker;
+
+        sortWorkers();
+    };
+
+    //takes the workers object and sorts by hashrate descending
+    const sortWorkers = () => {
+        sortedWorkers.length = 0;
+        Object.entries(workers).forEach((worker) => {
+            sortedWorkers.push(worker);
+        });
+
+        if (sortedWorkers.length > 1) {
+            sortedWorkers.sort((a, b) => {
+                return b.hashrate - a.hashrate;
+            });
+        }
+
+        onUpdateWorkers(sortedWorkers);
     };
 
     //handles the initial balance information
@@ -75,7 +104,7 @@ const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
             };
         });
 
-        onUpdateBalances(balances);
+        sortBalances();
 
         //subscribe to receive future updates.
         wampSession.current.subscribe(
@@ -87,6 +116,28 @@ const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
     //handles live balance updates
     const onBalanceUpdate = (update) => {
         console.log("BALANCE UPDATE", update);
+        const updatedCoin = update[0];
+
+        //update balance here...
+        balances[updatedCoin.coin].balance += updatedCoin.balance;
+
+        sortBalances();
+    };
+
+    //takes the balances object and sorts by balance descending
+    const sortBalances = () => {
+        sortedBalances.length = 0;
+        Object.entries(balances).forEach((balance) => {
+            sortedBalances.push(balance);
+        });
+
+        if (sortedBalances.length > 1) {
+            sortedBalances.sort((a, b) => {
+                return b[1].balance - a[1].balance;
+            });
+        }
+
+        onUpdateBalances(sortedBalances);
     };
 
     useEffect(() => {
