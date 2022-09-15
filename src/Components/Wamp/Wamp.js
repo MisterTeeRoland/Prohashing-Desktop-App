@@ -1,14 +1,22 @@
 import React, { useEffect, useRef } from "react";
 import autobahn from "autobahn";
+import axios from "axios";
+
+const axiosInstance = axios.create({
+    validateStatus: function (status) {
+        return true;
+    },
+});
 
 const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
     const wampUser = "web";
     const wampPassword = "web";
     const wampConnection = useRef(null);
     const wampSession = useRef(null);
+    const allTokens = useRef({});
 
-    const balances = {};
-    const workers = {};
+    const balances = useRef({});
+    const workers = useRef({});
 
     //If using node.js, the following code resolves an issue where the Electronic Frontier Foundation's free certificates are not trusted.
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -36,21 +44,25 @@ const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
     };
 
     //handles found block data
-    const onBlockUpdate = (block) => {
-        // console.log("BLOCK", block);
-        //TODO: if block is found by a miner in the workers array, send notification
+    const onBlockUpdate = (foundBlock) => {
+        const block = foundBlock[0];
+        console.log("BLOCK", block);
+        //if block is found by a miner in the workers array, send notification
+        if (workers.hasOwnProperty(block.worker_name)) {
+            // const notificationTitle = "Block Found!";
+            const notificationBody = `You found ${block.coin_name} block ${block.block_height}!`;
+            new Notification(notificationBody);
+        }
     };
 
     //handles the initial miner information
     const initialSessionUpdatesReceived = (updates) => {
         //Handle the initial miner information here.
-
-        console.log("initial miner values -", updates);
         updates.forEach((worker, index) => {
-            workers[worker.miner_name] = worker;
+            workers.current[worker.uuid] = worker;
         });
 
-        onUpdateWorkers(workers);
+        sortWorkers();
 
         //After handling the initial information, now subscribe to receive future updates.
         wampSession.current.subscribe(
@@ -61,21 +73,58 @@ const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
 
     //handles live miner updates
     const onMinerUpdate = (update) => {
-        console.log("MINER UPDATE", update);
-        // restoreDict(workers, update);
+        const worker = update[0];
+        //update worker here...
+        workers.current[worker.uuid] = {
+            ...workers?.current?.[worker.uuid],
+            ...worker,
+        };
+
+        sortWorkers();
+    };
+
+    //takes the workers object and sorts by hashrate descending
+    const sortWorkers = () => {
+        const sortedWorkers = [];
+        Object.values(workers?.current).forEach((worker) => {
+            sortedWorkers.push(worker);
+        });
+
+        if (sortedWorkers.length > 1) {
+            sortedWorkers.sort((a, b) => {
+                return b.hashrate - a.hashrate;
+            });
+        }
+
+        onUpdateWorkers(sortedWorkers);
+    };
+
+    //finds the token information from the token list
+    const findPHToken = (token) => {
+        const obj = Object.values(allTokens.current).find(
+            (t) => t.name === token,
+        );
+        return obj;
     };
 
     //handles the initial balance information
-    const initialBalanceUpdatesReceived = (updates) => {
-        console.log("initial balance values -", updates);
+    const initialBalanceUpdatesReceived = async (updates) => {
         Object.entries(updates).forEach(([curr, value]) => {
-            balances[curr] = {
-                name: curr,
-                balance: value,
-            };
+            //make a call to get the info for the currency
+            const phToken = findPHToken(curr);
+            if (phToken) {
+                balances.current[curr] = {
+                    name: phToken?.name ?? curr,
+                    symbol: phToken?.abbreviation ?? null,
+                    balance: value,
+                    enabled: phToken?.enabled ?? false,
+                    algo: phToken?.algo ?? null,
+                    port: phToken?.port ?? null,
+                };
+            }
         });
 
-        onUpdateBalances(balances);
+        sortBalances();
 
         //subscribe to receive future updates.
         wampSession.current.subscribe(
@@ -86,7 +135,46 @@ const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
 
     //handles live balance updates
     const onBalanceUpdate = (update) => {
-        console.log("BALANCE UPDATE", update);
+        const updatedCoin = update[0];
+
+        //update balance here...
+        if (balances.current.hasOwnProperty(updatedCoin.coin)) {
+            balances.current[updatedCoin.coin].balance += updatedCoin.balance;
+        } else {
+            balances.current[updatedCoin.coin] = {
+                name: updatedCoin.coin,
+                balance: updatedCoin.balance,
+            };
+        }
+
+        sortBalances();
+    };
+
+    //takes the balances object and sorts by balance descending
+    const sortBalances = () => {
+        const sortedBalances = [];
+        Object.entries(balances.current).forEach((balance) => {
+            sortedBalances.push(balance);
+        });
+
+        if (sortedBalances.length > 1) {
+            sortedBalances.sort((a, b) => {
+                return b[1].balance - a[1].balance;
+            });
+        }
+
+        onUpdateBalances(sortedBalances);
+    };
+
+    const getProhashingTokens = async () => {
+        const request = await axiosInstance.get(
+            "https://prohashing.com/api/v1/currencies",
+        );
+
+        if (request.status === 200) {
+            const data = request.data.data;
+            allTokens.current = data;
+        }
     };
 
     useEffect(() => {
@@ -97,6 +185,7 @@ const Wamp = React.memo(({ apiKey, onUpdateBalances, onUpdateWorkers }) => {
         }
         try {
             if (!wampConnection.current) {
+                getProhashingTokens();
                 wampConnection.current = new autobahn.Connection({
                     url: "wss://live.prohashing.com:443/ws",
                     realm: "mining",

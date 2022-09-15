@@ -7,20 +7,15 @@ import ProhashingApiModal from "../Modal/ProhashingApiModal";
 const Settings = ({ settings, onSaveSettings }) => {
     const [apiKey, setApiKey] = useState(settings?.apiKey ?? "");
     const [currency, setCurrency] = useState(settings?.currency ?? "USD");
-    const [smallBalance, setSmallBalance] = useState(
-        settings?.smallBalance ?? 0.01,
-    );
-
     const [showPHModal, setShowPHModal] = useState(false);
 
     const saveSettings = () => {
-        onSaveSettings({ apiKey, currency, smallBalance });
+        onSaveSettings({ apiKey, currency });
     };
 
     const resetSettings = () => {
         setApiKey("");
         setCurrency("USD");
-        setSmallBalance(0.01);
         onSaveSettings({});
     };
 
@@ -63,16 +58,6 @@ const Settings = ({ settings, onSaveSettings }) => {
                         onChange={(e) => setCurrency(e.target.value)}>
                         <option value="usd">USD</option>
                     </select>
-                </div>
-
-                <div className="formControl">
-                    <label>Hide Balances Under</label>
-                    <input
-                        type="number"
-                        value={smallBalance}
-                        onChange={(e) => setSmallBalance(e.target.value)}
-                        min="0"
-                    />
                 </div>
             </div>
 

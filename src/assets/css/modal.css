@@ -6,6 +6,7 @@
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 100;
+    backdrop-filter: blur(3px);
 }
 
 .modal {
@@ -17,6 +18,8 @@
     padding: 30px;
     z-index: 101;
     border-radius: 8px;
+    max-width: min(500px, 90%);
+    min-width: min(250px, 90%);
 }
 
 .modalCloseBox {
@@ -25,14 +28,14 @@
     right: 15px;
     cursor: pointer;
     border: 2px solid white;
-    width: 25px;
-    height: 25px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
 }
 
 .modalCloseX {
     color: #fff;
-    font-size: 25px;
+    font-size: 20px;
     font-weight: bold;
     position: absolute;
     top: 50%;
@@ -44,9 +47,26 @@
     font-size: 24px;
     font-weight: bold;
     color: #fff;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    /* margin-top: 10px; */
+    display: flex;
+    flex-direction: row;
+    align-items: top;
 }
 
 .listItem {
     margin-bottom: 5px;
+}
+
+.modalIcon {
+    width: 45px;
+    height: 45px;
+    margin-right: 10px;
+    margin-top: 5px;
+}
+
+.modalSymbol {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
 }
