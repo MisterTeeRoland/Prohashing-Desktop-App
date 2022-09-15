@@ -17,6 +17,7 @@
     padding: 30px;
     z-index: 101;
     border-radius: 8px;
+    max-width: min(500px, 90%);
 }
 
 .modalCloseBox {
