@@ -84,9 +84,10 @@ function App() {
                     />
                 </Routes>
             </div>
-            {settings?.apiKey && (
+            {settings?.apiKey && settings?.currency && (
                 <Wamp
                     apiKey={settings?.apiKey ?? null}
+                    currency={settings?.currency ?? "usd"}
                     onUpdateBalances={updateBalances}
                     onUpdateWorkers={updateWorkers}
                 />

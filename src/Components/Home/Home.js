@@ -73,9 +73,13 @@ const Home = ({ settings, balances }) => {
                                     </div>
                                     <div className="tokenUsdValue">
                                         <div className="tokenCurrencyValue">
-                                            ${token?.usdValue?.toFixed(2)}
+                                            $
+                                            {token?.usdValue?.toFixed(8) ??
+                                                parseFloat("0.00").toFixed(8)}
                                         </div>
-                                        <div className="tokenCurrency">USD</div>
+                                        <div className="tokenCurrency">
+                                            {settings?.currency?.toUpperCase()}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
