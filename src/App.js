@@ -6,6 +6,8 @@ import Workers from "./Components/Workers/Workers";
 import Settings from "./Components/Settings/Settings";
 import { useEffect, useState } from "react";
 import Wamp from "./Components/Wamp/Wamp";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
     const pageLayout = {
@@ -38,6 +40,20 @@ function App() {
         setWorkers(workers);
     };
 
+    const sendToast = (message, type) => {
+        switch (type) {
+            case "success":
+                toast.success(message);
+                break;
+            case "error":
+                toast.error(message);
+                break;
+            default:
+                toast(message);
+                break;
+        }
+    };
+
     return (
         <Router>
             <div style={pageLayout}>
@@ -62,6 +78,7 @@ function App() {
                             <Settings
                                 settings={settings}
                                 onSaveSettings={trySaveSettings}
+                                onSendToast={sendToast}
                             />
                         }
                     />
@@ -74,6 +91,8 @@ function App() {
                     onUpdateWorkers={updateWorkers}
                 />
             )}
+
+            <ToastContainer autoClose={2000} />
         </Router>
     );
 }
