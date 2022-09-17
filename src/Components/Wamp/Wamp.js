@@ -18,7 +18,8 @@ const Wamp = React.memo(
         const wampPassword = "web";
         const wampConnection = useRef(null);
         const wampSession = useRef(null);
-        const allTokens = useRef({});
+        const allTokens = useRef(null);
+        const currentCurrency = useRef(null);
 
         const balances = useRef({});
         const workers = useRef({});
@@ -106,10 +107,15 @@ const Wamp = React.memo(
 
         //finds the token information from the token list
         const findPHToken = (token) => {
-            const obj = Object.values(allTokens.current).find(
-                (t) => t.name === token,
-            );
-            return obj;
+            try {
+                const obj = Object.values(allTokens.current).find(
+                    (t) => t.name === token,
+                );
+                return obj;
+            } catch (e) {
+                console.error("Error finding token", e);
+                return null;
+            }
         };
 
         const findCoinGeckoId = (token) => {
@@ -173,7 +179,7 @@ const Wamp = React.memo(
             try {
                 const response = await CoinGeckoClient.simple.price({
                     ids: idList,
-                    vs_currency: currency,
+                    vs_currencies: currentCurrency.current,
                 });
                 data = response?.data ?? {};
             } catch (error) {
@@ -206,14 +212,15 @@ const Wamp = React.memo(
             const prices = await getCoinGeckoPrices(idList);
 
             Object.entries(prices).forEach(([id, value]) => {
-                const rate = value[currency];
+                const rate = value[currentCurrency.current];
                 const name = findCoinGeckoName(id);
 
                 //save the conversion rate && update the usd balance
-                sortedBalances.forEach((token) => {
+                sortedBalances.forEach((token, index) => {
                     if (token[1].name === name) {
-                        token[1].rate = rate;
-                        token[1].usdValue = token[1].balance * rate;
+                        sortedBalances[index][1].rate = rate;
+                        sortedBalances[index][1].usdValue =
+                            token[1].balance * rate;
                     }
                 });
             });
@@ -245,9 +252,19 @@ const Wamp = React.memo(
                 wampSession.current = null;
                 return;
             }
+            if (
+                !currentCurrency.current ||
+                currentCurrency.current !== currency
+            ) {
+                currentCurrency.current = currency;
+                sortBalances();
+            }
+
             try {
                 if (!wampConnection.current) {
-                    getProhashingTokens();
+                    if (!allTokens.current) {
+                        getProhashingTokens();
+                    }
                     wampConnection.current = new autobahn.Connection({
                         url: "wss://live.prohashing.com:443/ws",
                         realm: "mining",
@@ -262,7 +279,7 @@ const Wamp = React.memo(
                 console.error(e);
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [apiKey]);
+        }, [apiKey, currency]);
 
         return <></>;
     },
