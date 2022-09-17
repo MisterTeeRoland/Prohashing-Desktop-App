@@ -6,6 +6,8 @@ import Workers from "./Components/Workers/Workers";
 import Settings from "./Components/Settings/Settings";
 import { useEffect, useState } from "react";
 import Wamp from "./Components/Wamp/Wamp";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
     const pageLayout = {
@@ -15,7 +17,9 @@ function App() {
 
     const [settings, setSettings] = useState({});
     const [balances, setBalances] = useState([]);
+    const [totalValue, setTotalValue] = useState(0);
     const [workers, setWorkers] = useState([]);
+    const [totalHashrate, setTotalHashrate] = useState(0);
 
     useEffect(() => {
         //load settings from local storage
@@ -30,12 +34,28 @@ function App() {
         localStorage.setItem("settings", JSON.stringify(settings));
     };
 
-    const updateBalances = (balances) => {
-        setBalances(balances);
+    const updateBalances = ({ sortedBalances, totalValue }) => {
+        setBalances(sortedBalances);
+        setTotalValue(totalValue);
     };
 
-    const updateWorkers = (workers) => {
-        setWorkers(workers);
+    const updateWorkers = ({ sortedWorkers, totalHashrate }) => {
+        setWorkers(sortedWorkers);
+        setTotalHashrate(totalHashrate);
+    };
+
+    const sendToast = (message, type) => {
+        switch (type) {
+            case "success":
+                toast.success(message);
+                break;
+            case "error":
+                toast.error(message);
+                break;
+            default:
+                toast(message);
+                break;
+        }
     };
 
     return (
@@ -47,13 +67,21 @@ function App() {
                     <Route
                         path="/"
                         element={
-                            <Home settings={settings} balances={balances} />
+                            <Home
+                                settings={settings}
+                                balances={balances}
+                                totalValue={totalValue}
+                            />
                         }
                     />
                     <Route
                         path="/workers"
                         element={
-                            <Workers settings={settings} workers={workers} />
+                            <Workers
+                                settings={settings}
+                                workers={workers}
+                                totalHashrate={totalHashrate}
+                            />
                         }
                     />
                     <Route
@@ -62,18 +90,22 @@ function App() {
                             <Settings
                                 settings={settings}
                                 onSaveSettings={trySaveSettings}
+                                onSendToast={sendToast}
                             />
                         }
                     />
                 </Routes>
             </div>
-            {settings?.apiKey && (
+            {settings?.apiKey && settings?.currency && (
                 <Wamp
                     apiKey={settings?.apiKey ?? null}
+                    currency={settings?.currency ?? "usd"}
                     onUpdateBalances={updateBalances}
                     onUpdateWorkers={updateWorkers}
                 />
             )}
+
+            <ToastContainer autoClose={2000} />
         </Router>
     );
 }

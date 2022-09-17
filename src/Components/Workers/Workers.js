@@ -5,39 +5,13 @@ import "../../assets/css/workers.css";
 import NoApiKeyWarning from "../API/NoApiKeyWarning";
 import NoWorkersWarning from "../API/NoWorkersWarning";
 import WorkerModal from "../Modal/WorkerModal";
+import { convertHashrate } from "../../helpers/utils";
 
-const Workers = ({ settings, workers }) => {
+const Workers = ({ settings, workers, totalHashrate }) => {
     const [showWorkerModal, setShowWorkerModal] = useState(false);
     const [workerData, setWorkerData] = useState(null);
 
-    const convertHashrate = (rate) => {
-        rate = parseFloat(rate);
-        let unit = "H/s";
-        if (rate >= 1000) {
-            rate /= 1000;
-            unit = "KH/s";
-        }
-        if (rate >= 1000) {
-            rate /= 1000;
-            unit = "MH/s";
-        }
-        if (rate >= 1000) {
-            rate /= 1000;
-            unit = "GH/s";
-        }
-        if (rate >= 1000) {
-            rate /= 1000;
-            unit = "TH/s";
-        }
-        if (rate >= 1000) {
-            rate /= 1000;
-            unit = "PH/s";
-        }
-        return {
-            rate: rate.toFixed(3),
-            unit,
-        };
-    };
+    const totalHashrateConverted = convertHashrate(totalHashrate);
 
     const openWorkerModal = (worker) => {
         setWorkerData(worker);
@@ -55,6 +29,13 @@ const Workers = ({ settings, workers }) => {
                 <FaTruck size={"28px"} />{" "}
                 <div className="titleText">Workers</div>
             </div>
+
+            {settings?.apiKey && (
+                <div>
+                    Total hashrate: {totalHashrateConverted.rate}{" "}
+                    {totalHashrateConverted.unit}
+                </div>
+            )}
 
             <div className="workersContainer">
                 {!settings?.apiKey ? (
