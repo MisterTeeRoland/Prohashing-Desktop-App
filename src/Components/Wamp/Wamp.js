@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import autobahn from "autobahn";
 import axios from "axios";
-import CoinGecko from "coingecko-api";
-import { coinList } from "../../assets/coinList";
-
-const CoinGeckoClient = new CoinGecko();
+import {
+    findCoinGeckoId,
+    findCoinGeckoName,
+    getCoinGeckoPrices,
+} from "../../helpers/CoinGecko";
 
 const axiosInstance = axios.create({
     validateStatus: function (status) {
@@ -92,8 +93,10 @@ const Wamp = React.memo(
         //takes the workers object and sorts by hashrate descending
         const sortWorkers = () => {
             const sortedWorkers = [];
+            let totalHashrate = 0;
             Object.values(workers?.current).forEach((worker) => {
                 sortedWorkers.push(worker);
+                totalHashrate += worker.hashrate;
             });
 
             if (sortedWorkers.length > 1) {
@@ -102,7 +105,10 @@ const Wamp = React.memo(
                 });
             }
 
-            onUpdateWorkers(sortedWorkers);
+            onUpdateWorkers({
+                sortedWorkers,
+                totalHashrate,
+            });
         };
 
         //finds the token information from the token list
@@ -116,18 +122,6 @@ const Wamp = React.memo(
                 console.error("Error finding token", e);
                 return null;
             }
-        };
-
-        const findCoinGeckoId = (token) => {
-            const obj = Object.values(coinList).find(
-                (t) => t.name === token.name,
-            );
-            return obj?.id;
-        };
-
-        const findCoinGeckoName = (id) => {
-            const obj = Object.values(coinList).find((t) => t.id === id);
-            return obj?.name;
         };
 
         //handles the initial balance information
@@ -174,20 +168,6 @@ const Wamp = React.memo(
             sortBalances();
         };
 
-        const getCoinGeckoPrices = async (idList) => {
-            let data = {};
-            try {
-                const response = await CoinGeckoClient.simple.price({
-                    ids: idList,
-                    vs_currencies: currentCurrency.current,
-                });
-                data = response?.data ?? {};
-            } catch (error) {
-                console.error("GCGP error", error);
-            }
-            return data;
-        };
-
         //takes the balances object and sorts by balance descending
         const sortBalances = async () => {
             let sortedBalances = [];
@@ -209,7 +189,12 @@ const Wamp = React.memo(
                 .filter((id) => id !== undefined);
 
             //update prices
-            const prices = await getCoinGeckoPrices(idList);
+            const prices = await getCoinGeckoPrices(
+                idList,
+                currentCurrency.current,
+            );
+
+            let totalValue = 0;
 
             Object.entries(prices).forEach(([id, value]) => {
                 const rate = value[currentCurrency.current];
@@ -221,6 +206,8 @@ const Wamp = React.memo(
                         sortedBalances[index][1].rate = rate;
                         sortedBalances[index][1].usdValue =
                             token[1].balance * rate;
+
+                        totalValue += sortedBalances[index][1].usdValue;
                     }
                 });
             });
@@ -232,7 +219,10 @@ const Wamp = React.memo(
                 });
             }
 
-            onUpdateBalances(sortedBalances);
+            onUpdateBalances({
+                sortedBalances,
+                totalValue,
+            });
         };
 
         const getProhashingTokens = async () => {

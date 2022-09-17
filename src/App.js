@@ -17,7 +17,9 @@ function App() {
 
     const [settings, setSettings] = useState({});
     const [balances, setBalances] = useState([]);
+    const [totalValue, setTotalValue] = useState(0);
     const [workers, setWorkers] = useState([]);
+    const [totalHashrate, setTotalHashrate] = useState(0);
 
     useEffect(() => {
         //load settings from local storage
@@ -32,12 +34,14 @@ function App() {
         localStorage.setItem("settings", JSON.stringify(settings));
     };
 
-    const updateBalances = (balances) => {
-        setBalances(balances);
+    const updateBalances = ({ sortedBalances, totalValue }) => {
+        setBalances(sortedBalances);
+        setTotalValue(totalValue);
     };
 
-    const updateWorkers = (workers) => {
-        setWorkers(workers);
+    const updateWorkers = ({ sortedWorkers, totalHashrate }) => {
+        setWorkers(sortedWorkers);
+        setTotalHashrate(totalHashrate);
     };
 
     const sendToast = (message, type) => {
@@ -63,13 +67,21 @@ function App() {
                     <Route
                         path="/"
                         element={
-                            <Home settings={settings} balances={balances} />
+                            <Home
+                                settings={settings}
+                                balances={balances}
+                                totalValue={totalValue}
+                            />
                         }
                     />
                     <Route
                         path="/workers"
                         element={
-                            <Workers settings={settings} workers={workers} />
+                            <Workers
+                                settings={settings}
+                                workers={workers}
+                                totalHashrate={totalHashrate}
+                            />
                         }
                     />
                     <Route

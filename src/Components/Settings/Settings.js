@@ -4,9 +4,7 @@ import "../../assets/css/layout.css";
 import "../../assets/css/settings.css";
 import ProhashingApiModal from "../Modal/ProhashingApiModal";
 import ConfirmResetSettingsModal from "../Modal/ConfirmResetSettingsModal";
-import CoinGecko from "coingecko-api";
-
-const CoinGeckoClient = new CoinGecko();
+import { getSupportedVSCurrencies } from "../../helpers/CoinGecko";
 
 const Settings = ({ settings, onSaveSettings, onSendToast }) => {
     const [apiKey, setApiKey] = useState(settings?.apiKey ?? "");
@@ -44,15 +42,14 @@ const Settings = ({ settings, onSaveSettings, onSendToast }) => {
         setShowConfirmModal(false);
     };
 
-    const getSupportedVSCurrencies = async () => {
-        const response = await CoinGeckoClient.simple.supportedVsCurrencies();
-        const data = response.data;
-        setSupportedCurrencies(data);
+    const tryGetCurrencies = async () => {
+        const currencies = await getSupportedVSCurrencies();
+        setSupportedCurrencies(currencies);
     };
 
     useEffect(() => {
         if (supportedCurrencies.length === 0) {
-            getSupportedVSCurrencies();
+            tryGetCurrencies();
         }
     }, []);
 

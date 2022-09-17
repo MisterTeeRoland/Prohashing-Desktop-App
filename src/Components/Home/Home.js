@@ -6,7 +6,7 @@ import NoApiKeyWarning from "../API/NoApiKeyWarning";
 import NoBalancesWarning from "../API/NoBalancesWarning";
 import EarningsModal from "../Modal/EarningsModal";
 
-const Home = ({ settings, balances }) => {
+const Home = ({ settings, balances, totalValue }) => {
     const [showEarningsModal, setShowEarningsModal] = useState(false);
     const [earningsData, setEarningsData] = useState(null);
 
@@ -25,6 +25,13 @@ const Home = ({ settings, balances }) => {
             <div className="pageTitle">
                 <FaHome size={"30px"} /> <div className="titleText">Home</div>
             </div>
+
+            {settings?.currency && (
+                <div>
+                    Current earnings: ${totalValue.toFixed(3)}{" "}
+                    {settings?.currency.toUpperCase()}
+                </div>
+            )}
 
             <div className="homeContainer">
                 {!settings?.apiKey ? (
