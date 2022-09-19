@@ -7,6 +7,7 @@ import NoWorkersWarning from "../API/NoWorkersWarning";
 import WorkerModal from "../Modal/WorkerModal";
 import { convertHashrate } from "../../helpers/utils";
 import { sortWorkers } from "../../helpers/Prohashing";
+import Worker from "./Worker";
 
 const Workers = React.memo(({ settings, workers, wampSession }) => {
     const [showWorkerModal, setShowWorkerModal] = useState(false);
@@ -107,40 +108,13 @@ const Workers = React.memo(({ settings, workers, wampSession }) => {
                 ) : !sortedWorkers || sortedWorkers.length === 0 ? (
                     <NoWorkersWarning />
                 ) : (
-                    sortedWorkers.map((worker, index) => {
-                        const workerHash = convertHashrate(worker.hashrate);
-                        return (
-                            <div
-                                className="workerContainer"
-                                key={index}
-                                onClick={() => openWorkerModal(worker)}>
-                                <div className="workerIcon">
-                                    <FaTruck size={"30px"} />
-                                </div>
-                                <div className="workerDetails">
-                                    <div className="workerInfo">
-                                        <div className="workerName">
-                                            {worker?.miner_name}
-                                        </div>
-                                        <div className="workerStatus">
-                                            {worker?.algorithm_name}{" "}
-                                            {worker?.coin_name
-                                                ? `- ${worker.coin_name}`
-                                                : ""}
-                                        </div>
-                                    </div>
-                                    <div className="workerHashRate">
-                                        <div className="hashValue">
-                                            {workerHash.rate} {workerHash.unit}
-                                        </div>
-                                        <div className="hashRatio">
-                                            {worker?.share_count ?? 0} shares
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })
+                    sortedWorkers.map((worker, index) => (
+                        <Worker
+                            worker={worker}
+                            index={index}
+                            onOpenWorkerModal={openWorkerModal}
+                        />
+                    ))
                 )}
             </div>
 

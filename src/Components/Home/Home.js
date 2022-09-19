@@ -7,6 +7,7 @@ import NoBalancesWarning from "../API/NoBalancesWarning";
 import EarningsModal from "../Modal/EarningsModal";
 import { findPHToken } from "../../helpers/Prohashing";
 import { sortBalances } from "../../helpers/Prohashing";
+import Coin from "./Coin";
 
 const Home = React.memo(({ settings, wampSession, allTokens }) => {
     const [showEarningsModal, setShowEarningsModal] = useState(false);
@@ -126,59 +127,14 @@ const Home = React.memo(({ settings, wampSession, allTokens }) => {
                 ) : !sortedBalances || sortedBalances.length === 0 ? (
                     <NoBalancesWarning />
                 ) : (
-                    sortedBalances.map(([name, token], index) => {
-                        //filter out balances below threshold
-                        if (token.balance < 0.00000001) {
-                            return null;
-                        }
-
-                        let icon = null;
-                        try {
-                            icon = require(`../../../node_modules/cryptocurrency-icons/svg/color/${token?.symbol?.toLowerCase()}.svg`);
-                            if (icon === undefined) throw new Error();
-                        } catch (e) {
-                            const genericIcon = require("../../../node_modules/cryptocurrency-icons/svg/color/generic.svg");
-                            icon = genericIcon.default;
-                        }
-
-                        return (
-                            <div
-                                className="tokenContainer"
-                                key={index}
-                                onClick={() => openEarningsModal(token)}>
-                                {token.symbol && (
-                                    <div className="tokenIcon">
-                                        <img
-                                            className="tokenIconImg"
-                                            src={icon}
-                                            alt={token.name}
-                                        />
-                                    </div>
-                                )}
-                                <div className="tokenDetails">
-                                    <div className="tokenNameBal">
-                                        <div className="tokenName">
-                                            {token?.name}
-                                        </div>
-                                        <div className="tokenBalance">
-                                            {token?.balance.toFixed(8)}{" "}
-                                            {token?.symbol}
-                                        </div>
-                                    </div>
-                                    <div className="tokenUsdValue">
-                                        <div className="tokenCurrencyValue">
-                                            $
-                                            {token?.usdValue?.toFixed(8) ??
-                                                parseFloat("0.00").toFixed(8)}
-                                        </div>
-                                        <div className="tokenCurrency">
-                                            {settings?.currency?.toUpperCase()}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })
+                    sortedBalances.map(([name, token], index) => (
+                        <Coin
+                            key={index}
+                            token={token}
+                            currency={settings?.currency ?? "usd"}
+                            onOpenEarningsModal={openEarningsModal}
+                        />
+                    ))
                 )}
             </div>
 
