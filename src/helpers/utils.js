@@ -26,3 +26,14 @@ export const convertHashrate = (rate) => {
         unit,
     };
 };
+
+export const calculateTotalHashrate = (algos) => {
+    let total = 0;
+    Object.entries(algos).forEach(([algo, value]) => {
+        total += value?.hashrate ?? 0;
+    });
+
+    const convertedHashrate = convertHashrate(total);
+
+    return `${convertedHashrate.rate} ${convertedHashrate.unit}`;
+};

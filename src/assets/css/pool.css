@@ -1,0 +1,74 @@
+.poolAlgorithm {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e6e6e6;
+}
+
+.poolCol {
+    flex: 1;
+    padding: 0 10px;
+}
+
+.connectedWorkersContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e6e6e6;
+}
+
+.overview {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.overviewItem {
+    border: 2px solid #e6e6e6;
+    border-radius: 5px;
+    text-align: center;
+    padding: 10px;
+}
+
+.overviewValue {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.overviewLabel {
+    font-size: 14px;
+}
+
+.tableTitle {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.tableHead {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: -10px;
+}
+
+.tableHeader {
+    flex: 1;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+}
+
+.poolAlgorithms {
+    margin-bottom: 30px;
+}

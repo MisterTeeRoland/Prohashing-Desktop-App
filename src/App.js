@@ -4,44 +4,72 @@ import Nav from "./Components/Nav/Nav";
 import Home from "./Components/Home/Home";
 import Workers from "./Components/Workers/Workers";
 import Settings from "./Components/Settings/Settings";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Wamp from "./Components/Wamp/Wamp";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Pool from "./Components/Pool/Pool";
+import { getProhashingTokens } from "./helpers/Prohashing";
+import { getSupportedVSCurrencies } from "./helpers/CoinGecko";
 
-function App() {
-    const pageLayout = {
-        display: "flex",
-        flexDirection: "row",
+const App = React.memo(() => {
+    const [settings, setSettings] = useState({});
+    const [appLoaded, setAppLoaded] = useState(false);
+
+    const wampSession = useRef(null);
+    const allTokens = useRef(null);
+    const allCurrencies = useRef([]);
+    const settingsLoaded = useRef(null);
+    const workers = useRef({});
+
+    //load settings from local storage
+    const loadSettings = () => {
+        const userSettings = localStorage.getItem("settings");
+        if (userSettings) {
+            setSettings(JSON.parse(userSettings));
+            settingsLoaded.current = true;
+        }
     };
 
-    const [settings, setSettings] = useState({});
-    const [balances, setBalances] = useState([]);
-    const [totalValue, setTotalValue] = useState(0);
-    const [workers, setWorkers] = useState([]);
-    const [totalHashrate, setTotalHashrate] = useState(0);
+    //get tokens from prohashing
+    const getTokens = async () => {
+        const tokens = await getProhashingTokens();
+        allTokens.current = tokens;
+    };
+
+    const getAllCurrencies = async () => {
+        const currencies = await getSupportedVSCurrencies();
+        allCurrencies.current = currencies;
+    };
+
+    const tryInit = async () => {
+        if (!appLoaded) {
+            if (!allTokens.current) {
+                await getTokens();
+            }
+            if (allCurrencies.current.length === 0) {
+                await getAllCurrencies();
+            }
+            if (
+                Object.entries(settings).length === 0 &&
+                !settingsLoaded.current
+            ) {
+                loadSettings();
+            }
+            setAppLoaded(true);
+        }
+    };
 
     useEffect(() => {
-        //load settings from local storage
-        const settings = localStorage.getItem("settings");
-        if (settings) {
-            setSettings(JSON.parse(settings));
+        if (!appLoaded) {
+            tryInit();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const trySaveSettings = (settings) => {
         setSettings(settings);
         localStorage.setItem("settings", JSON.stringify(settings));
-    };
-
-    const updateBalances = ({ sortedBalances, totalValue }) => {
-        setBalances(sortedBalances);
-        setTotalValue(totalValue);
-    };
-
-    const updateWorkers = ({ sortedWorkers, totalHashrate }) => {
-        setWorkers(sortedWorkers);
-        setTotalHashrate(totalHashrate);
     };
 
     const sendToast = (message, type) => {
@@ -59,55 +87,67 @@ function App() {
     };
 
     return (
-        <Router>
-            <div style={pageLayout}>
-                <Nav />
+        <>
+            {appLoaded ? (
+                <Router>
+                    <div className="pageLayout">
+                        <Nav />
 
-                <Routes>
-                    <Route
-                        path="/"
-                        element={
-                            <Home
-                                settings={settings}
-                                balances={balances}
-                                totalValue={totalValue}
+                        <Routes>
+                            <Route
+                                path="/"
+                                element={
+                                    <Home
+                                        settings={settings}
+                                        allTokens={allTokens}
+                                        wampSession={wampSession}
+                                    />
+                                }
                             />
-                        }
-                    />
-                    <Route
-                        path="/workers"
-                        element={
-                            <Workers
-                                settings={settings}
-                                workers={workers}
-                                totalHashrate={totalHashrate}
+                            <Route
+                                path="/workers"
+                                element={
+                                    <Workers
+                                        settings={settings}
+                                        workers={workers}
+                                        wampSession={wampSession}
+                                    />
+                                }
                             />
-                        }
-                    />
-                    <Route
-                        path="/settings"
-                        element={
-                            <Settings
-                                settings={settings}
-                                onSaveSettings={trySaveSettings}
-                                onSendToast={sendToast}
+                            <Route
+                                path="/settings"
+                                element={
+                                    <Settings
+                                        settings={settings}
+                                        allCurrencies={allCurrencies}
+                                        onSaveSettings={trySaveSettings}
+                                        onSendToast={sendToast}
+                                        wampSession={wampSession}
+                                    />
+                                }
                             />
-                        }
-                    />
-                </Routes>
-            </div>
-            {settings?.apiKey && settings?.currency && (
-                <Wamp
-                    apiKey={settings?.apiKey ?? null}
-                    currency={settings?.currency ?? "usd"}
-                    onUpdateBalances={updateBalances}
-                    onUpdateWorkers={updateWorkers}
-                />
+                            <Route
+                                path="/pool"
+                                element={<Pool wampSession={wampSession} />}
+                            />
+                        </Routes>
+                    </div>
+                    {settings?.apiKey && settings?.currency && (
+                        <Wamp
+                            apiKey={settings?.apiKey ?? null}
+                            currency={settings?.currency ?? "usd"}
+                            wampSession={wampSession}
+                            workers={workers}
+                        />
+                    )}
+
+                    <ToastContainer autoClose={2000} />
+                </Router>
+            ) : (
+                <div>Loading...</div>
             )}
-
-            <ToastContainer autoClose={2000} />
-        </Router>
+        </>
     );
-}
+});
 
 export default App;

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import icon from "../../assets/icon.png";
-import { FaHome, FaCog, FaTruck } from "react-icons/fa";
+import { FaHome, FaCog, FaTruck, FaCloud } from "react-icons/fa";
 import "../../assets/css/nav.css";
 
 const Nav = () => {
@@ -22,8 +22,7 @@ const Nav = () => {
                 <li className="listItemStyle">
                     <Link
                         to="/"
-                        className={`linkStyle ${page === "home" && "active"}`}
-                    >
+                        className={`linkStyle ${page === "home" && "active"}`}>
                         <FaHome size={"40px"} title={"Home"} />
                         <div className="linkText">Home</div>
                     </Link>
@@ -33,10 +32,17 @@ const Nav = () => {
                         to="/workers"
                         className={`linkStyle ${
                             page === "workers" && "active"
-                        }`}
-                    >
+                        }`}>
                         <FaTruck size={"40px"} title={"Workers"} />
                         <div className="linkText">Workers</div>
+                    </Link>
+                </li>
+                <li className="listItemStyle">
+                    <Link
+                        to="/pool"
+                        className={`linkStyle ${page === "pool" && "active"}`}>
+                        <FaCloud size={"40px"} title={"Pool"} />
+                        <div className="linkText">Pool</div>
                     </Link>
                 </li>
                 <li className="listItemStyle">
@@ -44,8 +50,7 @@ const Nav = () => {
                         to="/settings"
                         className={`linkStyle ${
                             page === "settings" && "active"
-                        }`}
-                    >
+                        }`}>
                         <FaCog size={"40px"} title={"Settings"} />
                         <div className="linkText">Settings</div>
                     </Link>

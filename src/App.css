@@ -1,5 +1,10 @@
 html,
 body {
-  background-color: #030a3e;
-  color: #fff;
+    background-color: #030a3e;
+    color: #fff;
+}
+
+.pageLayout {
+    display: flex;
+    flex-direction: row;
 }
