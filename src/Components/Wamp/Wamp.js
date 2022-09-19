@@ -14,7 +14,14 @@ const axiosInstance = axios.create({
 });
 
 const Wamp = React.memo(
-    ({ apiKey, currency, onUpdateBalances, onUpdateWorkers }) => {
+    ({
+        apiKey,
+        currency,
+        onUpdateBalances,
+        onUpdateWorkers,
+        onUpdatePoolStats,
+        onUpdateProfitability,
+    }) => {
         const wampUser = "web";
         const wampPassword = "web";
         const wampConnection = useRef(null);
@@ -24,6 +31,7 @@ const Wamp = React.memo(
 
         const balances = useRef({});
         const workers = useRef({});
+        const poolStats = useRef({});
 
         //If using node.js, the following code resolves an issue where the Electronic Frontier Foundation's free certificates are not trusted.
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -48,6 +56,40 @@ const Wamp = React.memo(
 
             //subscribe to block updates
             wampSession.current.subscribe("found_block_updates", onBlockUpdate);
+
+            //subscribe to pool statistics
+            wampSession.current
+                .call("f_all_general_updates")
+                .then(initialGeneralUpdatesReceived);
+
+            //subscribe to profitability updates
+            wampSession.current
+                .call("f_all_profitability_updates")
+                .then(initialProfitabilityUpdatesReceived);
+        };
+
+        const initialProfitabilityUpdatesReceived = (profitabilityUpdates) => {
+            onUpdateProfitability(profitabilityUpdates);
+            wampSession.current.subscribe(
+                "profitability_updates",
+                onProfitabilityUpdate,
+            );
+        };
+
+        const onProfitabilityUpdate = (profitabilityUpdate) => {
+            onUpdateProfitability(profitabilityUpdate[0]);
+        };
+
+        const initialGeneralUpdatesReceived = (generalUpdates) => {
+            poolStats.current = generalUpdates;
+            onUpdatePoolStats(generalUpdates);
+
+            wampSession.current.subscribe(`general_updates`, onGeneralUpdates);
+        };
+
+        const onGeneralUpdates = (generalUpdates) => {
+            poolStats.current = generalUpdates[0];
+            onUpdatePoolStats(generalUpdates[0]);
         };
 
         //handles found block data
@@ -57,7 +99,7 @@ const Wamp = React.memo(
             //if block is found by a miner in the workers array, send notification
             if (workers.hasOwnProperty(block.worker_name)) {
                 // const notificationTitle = "Block Found!";
-                const notificationBody = `You found ${block.coin_name} block ${block.block_height}!`;
+                const notificationBody = `You found ${block.coin_name} block ${block.block_height} (${block.algorithm})!`;
                 new Notification(notificationBody);
             }
         };
@@ -114,6 +156,12 @@ const Wamp = React.memo(
         //finds the token information from the token list
         const findPHToken = (token) => {
             try {
+                if (
+                    !allTokens.current ||
+                    Object.values(allTokens.current).length === 0
+                ) {
+                    throw new Error("No tokens found");
+                }
                 const obj = Object.values(allTokens.current).find(
                     (t) => t.name === token,
                 );
@@ -247,7 +295,7 @@ const Wamp = React.memo(
                 currentCurrency.current !== currency
             ) {
                 currentCurrency.current = currency;
-                sortBalances();
+                if (wampConnection.current) sortBalances();
             }
 
             try {

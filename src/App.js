@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import Wamp from "./Components/Wamp/Wamp";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Pool from "./Components/Pool/Pool";
 
 function App() {
     const pageLayout = {
@@ -20,6 +21,8 @@ function App() {
     const [totalValue, setTotalValue] = useState(0);
     const [workers, setWorkers] = useState([]);
     const [totalHashrate, setTotalHashrate] = useState(0);
+    const [poolStats, setPoolStats] = useState({});
+    const [profitability, setProfitability] = useState({});
 
     useEffect(() => {
         //load settings from local storage
@@ -42,6 +45,14 @@ function App() {
     const updateWorkers = ({ sortedWorkers, totalHashrate }) => {
         setWorkers(sortedWorkers);
         setTotalHashrate(totalHashrate);
+    };
+
+    const updatePoolStats = (poolStats) => {
+        setPoolStats(poolStats);
+    };
+
+    const updateProfitability = (profitability) => {
+        setProfitability(profitability);
     };
 
     const sendToast = (message, type) => {
@@ -94,6 +105,15 @@ function App() {
                             />
                         }
                     />
+                    <Route
+                        path="/pool"
+                        element={
+                            <Pool
+                                poolStats={poolStats}
+                                profitability={profitability}
+                            />
+                        }
+                    />
                 </Routes>
             </div>
             {settings?.apiKey && settings?.currency && (
@@ -102,6 +122,8 @@ function App() {
                     currency={settings?.currency ?? "usd"}
                     onUpdateBalances={updateBalances}
                     onUpdateWorkers={updateWorkers}
+                    onUpdatePoolStats={updatePoolStats}
+                    onUpdateProfitability={updateProfitability}
                 />
             )}
 
