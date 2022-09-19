@@ -30,7 +30,7 @@ export const convertHashrate = (rate) => {
 export const calculateTotalHashrate = (algos) => {
     let total = 0;
     Object.entries(algos).forEach(([algo, value]) => {
-        total += value.hashrate;
+        total += value?.hashrate ?? 0;
     });
 
     const convertedHashrate = convertHashrate(total);

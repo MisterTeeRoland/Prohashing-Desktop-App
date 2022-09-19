@@ -2,7 +2,7 @@ import React from "react";
 import { convertHashrate } from "../../helpers/utils";
 
 const AlgorithmRow = ({ algo }) => {
-    const convertedHashrate = convertHashrate(algo.hashrate);
+    const convertedHashrate = convertHashrate(algo?.hashrate ?? 0);
 
     return (
         <div className="poolAlgorithm" key={algo.name}>
