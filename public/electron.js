@@ -8,6 +8,7 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
+        icon: path.join(__dirname, "favicon.ico"),
         webPreferences: {
             nodeIntegration: true,
         },
@@ -18,7 +19,7 @@ function createWindow() {
     win.loadURL(
         isDev
             ? "http://localhost:3000"
-            : `file://${path.join(__dirname, "../build/index.html")}`
+            : `file://${path.join(__dirname, "../build/index.html")}`,
     );
     // Open the DevTools.
     if (isDev) {
