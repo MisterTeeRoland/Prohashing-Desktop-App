@@ -84,6 +84,11 @@ const Home = React.memo(({ settings, wampSession, allTokens }) => {
     };
 
     useEffect(() => {
+        const pageTitle = document.querySelector("title");
+        if (pageTitle) {
+            pageTitle.innerText = "Home | Prohashing Monitor";
+        }
+
         if (
             !wampSession.current ||
             !settings?.apiKey ||

@@ -60,10 +60,19 @@ const App = React.memo(() => {
         }
     };
 
+    const setPageInfo = () => {
+        const pageIcon = document.querySelector("link[rel=icon]");
+        if (pageIcon) {
+            pageIcon.href = "/favicon.ico";
+        }
+    };
+
     useEffect(() => {
         if (!appLoaded) {
             tryInit();
         }
+
+        setPageInfo();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

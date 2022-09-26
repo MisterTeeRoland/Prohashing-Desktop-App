@@ -65,6 +65,11 @@ const Workers = React.memo(({ settings, workers, wampSession }) => {
     };
 
     useEffect(() => {
+        const pageTitle = document.querySelector("title");
+        if (pageTitle) {
+            pageTitle.innerText = "Workers | Prohashing Monitor";
+        }
+
         if (
             !wampSession.current ||
             !settings?.apiKey ||
