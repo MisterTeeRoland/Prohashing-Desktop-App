@@ -8,3 +8,17 @@
     font-weight: bold;
     font-size: 24px;
 }
+
+.warningBold {
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.warningItem {
+    margin-top: 10px;
+}
+
+.warningPopup {
+    text-decoration: underline;
+    cursor: pointer;
+}

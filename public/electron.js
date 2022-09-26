@@ -1,6 +1,6 @@
 const path = require("path");
 
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, shell } = require("electron");
 const isDev = require("electron-is-dev");
 
 function createWindow() {
@@ -25,6 +25,11 @@ function createWindow() {
     if (isDev) {
         win.webContents.openDevTools({ mode: "detach" });
     }
+
+    win.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: "deny" };
+    });
 }
 
 // This method will be called when Electron has finished
