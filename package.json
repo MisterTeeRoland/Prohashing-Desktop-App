@@ -1,7 +1,12 @@
 {
-    "name": "testapp",
+    "name": "prohashing_monitor_app",
     "version": "0.1.0",
+    "description": "Desktop app used to monitor workers and earnings from Prohashing.com",
     "private": true,
+    "author": {
+        "name": "Tyler Roland",
+        "email": "tyler.roland.dev@gmail.com"
+    },
     "dependencies": {
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^13.4.0",
