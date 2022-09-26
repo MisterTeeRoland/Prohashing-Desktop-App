@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Pool from "./Components/Pool/Pool";
 import { getProhashingTokens } from "./helpers/Prohashing";
 import { getSupportedVSCurrencies } from "./helpers/CoinGecko";
+import LoadingScreen from "./Components/Loaders/LoadingScreen";
 
 const App = React.memo(() => {
     const [settings, setSettings] = useState({});
@@ -97,7 +98,7 @@ const App = React.memo(() => {
 
     return (
         <>
-            {appLoaded ? (
+            {appLoaded === true ? (
                 <Router>
                     <div className="pageLayout">
                         <Nav />
@@ -153,7 +154,7 @@ const App = React.memo(() => {
                     <ToastContainer autoClose={2000} />
                 </Router>
             ) : (
-                <div>Loading...</div>
+                <LoadingScreen />
             )}
         </>
     );
