@@ -8,12 +8,13 @@ import WorkerModal from "../Modal/WorkerModal";
 import { convertHashrate } from "../../helpers/utils";
 import { sortWorkers } from "../../helpers/Prohashing";
 import Worker from "./Worker";
+import LoadingScreen from "../Loaders/LoadingScreen";
 
 const Workers = React.memo(({ settings, workers, wampSession }) => {
     const [showWorkerModal, setShowWorkerModal] = useState(false);
     const [workerData, setWorkerData] = useState(null);
 
-    const [sortedWorkers, setSortedWorkers] = useState([]);
+    const [sortedWorkers, setSortedWorkers] = useState(null);
     const [totalHashrate, setTotalHashrate] = useState({});
 
     const sub1 = useRef(null);
@@ -110,7 +111,9 @@ const Workers = React.memo(({ settings, workers, wampSession }) => {
             <div className="workersContainer">
                 {!settings?.apiKey ? (
                     <NoApiKeyWarning />
-                ) : !sortedWorkers || sortedWorkers.length === 0 ? (
+                ) : !sortedWorkers ? (
+                    <LoadingScreen />
+                ) : sortedWorkers.length === 0 ? (
                     <NoWorkersWarning />
                 ) : (
                     sortedWorkers.map((worker, index) => (

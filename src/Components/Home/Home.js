@@ -8,12 +8,13 @@ import EarningsModal from "../Modal/EarningsModal";
 import { findPHToken } from "../../helpers/Prohashing";
 import { sortBalances } from "../../helpers/Prohashing";
 import Coin from "./Coin";
+import LoadingScreen from "../Loaders/LoadingScreen";
 
 const Home = React.memo(({ settings, wampSession, allTokens }) => {
     const [showEarningsModal, setShowEarningsModal] = useState(false);
     const [earningsData, setEarningsData] = useState(null);
 
-    const [sortedBalances, setSortedBalances] = useState([]);
+    const [sortedBalances, setSortedBalances] = useState(null);
     const [totalValue, setTotalValue] = useState(0);
 
     const balances = useRef({});
@@ -129,7 +130,9 @@ const Home = React.memo(({ settings, wampSession, allTokens }) => {
             <div className="homeContainer">
                 {!settings?.apiKey ? (
                     <NoApiKeyWarning />
-                ) : !sortedBalances || sortedBalances.length === 0 ? (
+                ) : !sortedBalances ? (
+                    <LoadingScreen />
+                ) : sortedBalances.length === 0 ? (
                     <NoBalancesWarning />
                 ) : (
                     sortedBalances.map(([name, token], index) => (
