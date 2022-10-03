@@ -19,7 +19,6 @@ const Wamp = React.memo(({ apiKey, wampSession, workers }) => {
         //get initial miner data
         wampSession.current = session;
 
-        console.log("subscribing to blocks");
         //subscribe to block updates
         wampSession.current.subscribe("found_block_updates", onBlockUpdate);
     };

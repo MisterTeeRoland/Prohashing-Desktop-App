@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaCog, FaInfoCircle } from "react-icons/fa";
 import "../../assets/css/layout.css";
 import "../../assets/css/settings.css";
@@ -39,6 +39,13 @@ const Settings = React.memo(
         const hideConfirmReset = () => {
             setShowConfirmModal(false);
         };
+
+        useEffect(() => {
+            const pageTitle = document.querySelector("title");
+            if (pageTitle) {
+                pageTitle.innerText = "Settings | Prohashing Monitor";
+            }
+        }, []);
 
         return (
             <div className="phContainer">

@@ -103,6 +103,11 @@ const Pool = React.memo(({ wampSession }) => {
     };
 
     useEffect(() => {
+        const pageTitle = document.querySelector("title");
+        if (pageTitle) {
+            pageTitle.innerText = "Pool Stats | Prohashing Monitor";
+        }
+
         if (!wampSession.current) return;
 
         if (!sub1.current && !sub1Loading.current) {

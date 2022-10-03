@@ -8,16 +8,19 @@ import EarningsModal from "../Modal/EarningsModal";
 import { findPHToken } from "../../helpers/Prohashing";
 import { sortBalances } from "../../helpers/Prohashing";
 import Coin from "./Coin";
+import LoadingScreen from "../Loaders/LoadingScreen";
 
 const Home = React.memo(({ settings, wampSession, allTokens }) => {
     const [showEarningsModal, setShowEarningsModal] = useState(false);
     const [earningsData, setEarningsData] = useState(null);
 
-    const [sortedBalances, setSortedBalances] = useState([]);
+    const [sortedBalances, setSortedBalances] = useState(null);
     const [totalValue, setTotalValue] = useState(0);
+    const [hasLoaded, setHasLoaded] = useState(false);
 
     const balances = useRef({});
     const sub1 = useRef(null);
+    const refresh = useRef(null);
 
     const openEarningsModal = (balance) => {
         setEarningsData(balance);
@@ -84,29 +87,48 @@ const Home = React.memo(({ settings, wampSession, allTokens }) => {
     };
 
     useEffect(() => {
+        const pageTitle = document.querySelector("title");
+        if (pageTitle) {
+            pageTitle.innerText = "Home | Prohashing Monitor";
+        }
+
         if (
             !wampSession.current ||
             !settings?.apiKey ||
             settings?.apiKey?.trim() === ""
-        )
-            return;
-
-        wampSession.current
-            .call("f_all_balance_updates", [settings?.apiKey])
-            .then(initialBalanceUpdatesReceived);
-
-        const wamp = wampSession.current;
-
-        return () => {
-            if (wamp) {
-                if (sub1.current) {
-                    wamp.unsubscribe(sub1.current);
-                    sub1.current = null;
+        ) {
+            //timeout loop
+            refresh.current = setTimeout(() => {
+                if (wampSession.current && settings?.hasOwnProperty("apiKey")) {
+                    clearTimeout(refresh.current);
+                    refresh.current = null;
+                    setHasLoaded(true);
                 }
+            }, 500);
+            return;
+        } else {
+            if (refresh.current) {
+                clearTimeout(refresh.current);
+                refresh.current = null;
             }
-        };
+
+            wampSession.current
+                .call("f_all_balance_updates", [settings?.apiKey])
+                .then(initialBalanceUpdatesReceived);
+
+            const wamp = wampSession.current;
+
+            return () => {
+                if (wamp) {
+                    if (sub1.current) {
+                        wamp.unsubscribe(sub1.current);
+                        sub1.current = null;
+                    }
+                }
+            };
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [wampSession, settings]);
+    }, [settings, hasLoaded]);
 
     return (
         <div className="phContainer">
@@ -124,7 +146,9 @@ const Home = React.memo(({ settings, wampSession, allTokens }) => {
             <div className="homeContainer">
                 {!settings?.apiKey ? (
                     <NoApiKeyWarning />
-                ) : !sortedBalances || sortedBalances.length === 0 ? (
+                ) : !sortedBalances ? (
+                    <LoadingScreen />
+                ) : sortedBalances.length === 0 ? (
                     <NoBalancesWarning />
                 ) : (
                     sortedBalances.map(([name, token], index) => (

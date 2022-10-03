@@ -1,6 +1,6 @@
 const path = require("path");
 
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, shell } = require("electron");
 const isDev = require("electron-is-dev");
 
 function createWindow() {
@@ -8,9 +8,11 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 800,
         height: 600,
+        icon: path.join(__dirname, "favicon.ico"),
         webPreferences: {
             nodeIntegration: true,
         },
+        autoHideMenuBar: true,
     });
 
     // and load the index.html of the app.
@@ -18,12 +20,17 @@ function createWindow() {
     win.loadURL(
         isDev
             ? "http://localhost:3000"
-            : `file://${path.join(__dirname, "../build/index.html")}`
+            : `file://${path.join(__dirname, "../build/index.html")}`,
     );
     // Open the DevTools.
     if (isDev) {
         win.webContents.openDevTools({ mode: "detach" });
     }
+
+    win.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: "deny" };
+    });
 }
 
 // This method will be called when Electron has finished
